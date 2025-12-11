@@ -1,0 +1,194 @@
+club,player_name,age,pos,market_value,fee,is_loan
+AFC Bournemouth,Evanilson,24,CF,35000000.0,37000000.0,0
+AFC Bournemouth,Luis Sinisterra,25,LW,17000000.0,23400000.0,0
+AFC Bournemouth,Dean Huijsen,19,CB,10000000.0,19630000.0,0
+AFC Bournemouth,Enes Ünal,27,CF,18000000.0,16500000.0,0
+AFC Bournemouth,Julián Araujo,23,RB,8000000.0,10000000.0,0
+AFC Bournemouth,Kepa Arrizabalaga,29,GK,12000000.0,3600000.0,1
+AFC Bournemouth,Alex Paulsen,21,GK,450000.0,2270000.0,0
+AFC Bournemouth,Daniel Jebbison,20,CF,1000000.0,0.0,0
+AFC Bournemouth,Eli Kroupi,18,CF,10000000.0,13000000.0,0
+AFC Bournemouth,Julio Soler,19,LB,8000000.0,8000000.0,0
+AFC Bournemouth,Matai Akinmboni,18,CB,1000000.0,1500000.0,0
+Arsenal FC,Riccardo Calafiori,22,LB,45000000.0,45000000.0,0
+Arsenal FC,Mikel Merino,28,CM,50000000.0,32000000.0,0
+Arsenal FC,David Raya,28,GK,35000000.0,31900000.0,0
+Arsenal FC,Neto,35,GK,2500000.0,0.0,1
+Arsenal FC,Raheem Sterling,29,RW,35000000.0,0.0,1
+Aston Villa,Amadou Onana,22,DM,50000000.0,59350000.0,0
+Aston Villa,Ian Maatsen,22,LB,40000000.0,44500000.0,0
+Aston Villa,Cameron Archer,22,CF,13000000.0,16649999.999999998,0
+Aston Villa,Jaden Philogene,22,LW,15000000.0,16000000.0,0
+Aston Villa,Samuel Iling-Junior,20,LB,13000000.0,14000000.0,0
+Aston Villa,Lewis Dobbin,21,LW,2500000.0,11800000.0,0
+Aston Villa,Enzo Barrenechea,23,DM,7500000.0,8000000.0,0
+Aston Villa,Ross Barkley,30,CM,8000000.0,5900000.0,0
+Aston Villa,Donyell Malen,25,RW,28000000.0,25000000.0,0
+Aston Villa,Andrés García,21,RB,1200000.0,7000000.0,0
+Aston Villa,Axel Disasi,26,CB,30000000.0,6000000.0,1
+Aston Villa,Marcus Rashford,27,LW,55000000.0,0.0,1
+Aston Villa,Marco Asensio,29,AM,20000000.0,0.0,1
+Brentford FC,Igor Thiago,23,CF,25000000.0,33000000.0,0
+Brentford FC,Sepp van den Berg,22,CB,12000000.0,23600000.0,0
+Brentford FC,Fábio Carvalho,21,AM,14000000.0,23400000.0,0
+Brentford FC,Gustavo Nunes,18,LW,10000000.0,12000000.0,0
+Brentford FC,Jayden Meghoma,18,LB,,5900000.0,0
+Brentford FC,Michael Kayode,20,RB,18000000.0,500000.0,1
+Brighton & Hove Albion,Georginio Rutter,22,CF,18000000.0,46700000.0,0
+Brighton & Hove Albion,Yankuba Minteh,19,RW,16000000.0,35000000.0,0
+Brighton & Hove Albion,Mats Wieffer,24,DM,30000000.0,32000000.0,0
+Brighton & Hove Albion,Brajan Gruda,20,RW,20000000.0,31500000.0,0
+Brighton & Hove Albion,Ferdi Kadıoğlu,24,LB,30000000.0,30000000.0,0
+Brighton & Hove Albion,Matt O'Riley,23,CM,20000000.0,29500000.0,0
+Brighton & Hove Albion,Ibrahim Osman,19,LW,12000000.0,19500000.0,0
+Brighton & Hove Albion,Malick Yalcouyé,18,CM,5000000.0,7000000.0,0
+Brighton & Hove Albion,Amario Cozier-Duberry,19,RW,2000000.0,0.0,0
+Brighton & Hove Albion,Stefanos Tzimas,19,CF,10000000.0,26500000.0,0
+Brighton & Hove Albion,Diego Gómez,21,CM,12000000.0,13000000.0,0
+Brighton & Hove Albion,Eiran Cashin,23,CB,1800000.0,10750000.0,0
+Chelsea FC,Pedro Neto,24,RW,55000000.0,60000000.0,0
+Chelsea FC,João Félix,24,SS,30000000.0,52000000.0,0
+Chelsea FC,Kiernan Dewsbury-Hall,25,CM,30000000.0,35400000.0,0
+Chelsea FC,Filip Jørgensen,22,GK,20000000.0,24500000.0,0
+Chelsea FC,Omari Kellyman,18,AM,1000000.0,22500000.0,0
+Chelsea FC,Mike Penders,19,GK,1000000.0,20000000.0,0
+Chelsea FC,Aarón Anselmino,19,CB,3000000.0,16500000.0,0
+Chelsea FC,Renato Veiga,20,CB,3000000.0,14000000.0,0
+Chelsea FC,Caleb Wiley,19,LB,5000000.0,10100000.0,0
+Chelsea FC,Marc Guiu,18,CF,7500000.0,6000000.0,0
+Chelsea FC,Jadon Sancho,24,LW,30000000.0,5900000.0,1
+Chelsea FC,Tosin Adarabioyo,26,CB,20000000.0,0.0,0
+Chelsea FC,Mathis Amougou,19,CM,5000000.0,15000000.0,0
+Crystal Palace,Eddie Nketiah,25,CF,30000000.0,29700000.0,0
+Crystal Palace,Maxence Lacroix,24,CB,20000000.0,18000000.0,0
+Crystal Palace,Chadi Riad,21,CB,15000000.0,15000000.0,0
+Crystal Palace,Ismaïla Sarr,26,RW,18000000.0,15000000.0,0
+Crystal Palace,Daichi Kamada,27,AM,18000000.0,0.0,0
+Crystal Palace,Trevoh Chalobah,25,CB,13000000.0,0.0,1
+Crystal Palace,Matt Turner,30,GK,7000000.0,0.0,1
+Crystal Palace,Romain Esse,19,RW,5000000.0,14200000.0,0
+Crystal Palace,Ben Chilwell,28,LB,20000000.0,0.0,1
+Everton FC,Jake O'Brien,23,RB,12000000.0,19500000.0,0
+Everton FC,Iliman Ndiaye,24,RW,15000000.0,18000000.0,0
+Everton FC,Tim Iroegbunam,21,CM,4000000.0,10700000.0,0
+Everton FC,Jesper Lindstrøm,24,RW,22000000.0,2000000.0,1
+Everton FC,Asmir Begovic,37,GK,300000.0,0.0,0
+Everton FC,Armando Broja,22,CF,22000000.0,0.0,1
+Everton FC,Orel Mangala,26,DM,20000000.0,0.0,1
+Everton FC,Carlos Alcaraz,22,CM,14000000.0,0.0,1
+Fulham FC,Emile Smith Rowe,24,AM,22000000.0,31800000.0,0
+Fulham FC,Joachim Andersen,28,CB,35000000.0,29500000.0,0
+Fulham FC,Sander Berge,26,DM,20000000.0,23550000.0,0
+Fulham FC,Jorge Cuenca,24,CB,6000000.0,6700000.0,0
+Fulham FC,Ryan Sessegnon,24,LB,10000000.0,0.0,0
+Fulham FC,Reiss Nelson,24,LW,15000000.0,0.0,1
+Fulham FC,Willian,36,LW,1000000.0,,0
+Ipswich Town,Omari Hutchinson,20,AM,7000000.0,23500000.0,0
+Ipswich Town,Jacob Greaves,23,CB,15000000.0,21500000.0,0
+Ipswich Town,Liam Delap,21,CF,8000000.0,17850000.0,0
+Ipswich Town,Jack Clarke,23,LW,15000000.0,17700000.0,0
+Ipswich Town,Dara O'Shea,25,CB,7000000.0,14200000.0,0
+Ipswich Town,Sammie Szmodics,28,AM,7000000.0,10600000.0,0
+Ipswich Town,Arijanet Murić,25,GK,7000000.0,9550000.0,0
+Ipswich Town,Chiedozie Ogbene,27,RW,8000000.0,9500000.0,0
+Ipswich Town,Jens Cajuste,25,DM,10000000.0,1500000.0,1
+Ipswich Town,Conor Townsend,31,LB,1500000.0,590000.0,0
+Ipswich Town,Ben Johnson,24,RB,8000000.0,0.0,0
+Ipswich Town,Kalvin Phillips,28,DM,25000000.0,0.0,1
+Ipswich Town,Jaden Philogene,22,LW,15000000.0,23700000.0,0
+Ipswich Town,Alex Palmer,28,GK,1200000.0,2400000.0,0
+Ipswich Town,Ben Godfrey,26,CB,8000000.0,0.0,1
+Ipswich Town,Julio Enciso,21,AM,22000000.0,0.0,1
+Leicester City,Oliver Skipp,23,DM,15000000.0,23500000.0,0
+Leicester City,Bilal El Khannouss,20,AM,30000000.0,22500000.0,0
+Leicester City,Issahaku Fatawu,20,RW,10000000.0,16250000.0,0
+Leicester City,Caleb Okoli,22,CB,8000000.0,14000000.0,0
+Leicester City,Michael Golding,18,CM,300000.0,5900000.0,0
+Leicester City,Jordan Ayew,32,CF,4000000.0,5900000.0,0
+Leicester City,Bobby De Cordova-Reid,31,RW,5000000.0,0.0,0
+Leicester City,Facundo Buonanotte,19,AM,18000000.0,0.0,1
+Leicester City,Odsonne Édouard,26,CF,18000000.0,0.0,1
+Leicester City,Woyo Coulibaly,25,RB,2000000.0,3000000.0,0
+Liverpool FC,Giorgi Mamardashvili,23,GK,45000000.0,30000000.0,0
+Liverpool FC,Federico Chiesa,26,RW,35000000.0,12000000.0,0
+Manchester City,Savinho,20,LW,50000000.0,25000000.0,0
+Manchester City,İlkay Gündoğan,33,CM,15000000.0,0.0,0
+Manchester City,Omar Marmoush,25,CF,60000000.0,75000000.0,0
+Manchester City,Nico González,23,DM,18000000.0,60000000.0,0
+Manchester City,Abdukodir Khusanov,20,CB,12000000.0,40000000.0,0
+Manchester City,Vitor Reis,19,CB,14000000.0,37000000.0,0
+Manchester City,Juma Bah,18,CB,1000000.0,6000000.0,0
+Manchester United,Leny Yoro,18,CB,50000000.0,62000000.0,0
+Manchester United,Manuel Ugarte,23,DM,45000000.0,50000000.0,0
+Manchester United,Matthijs de Ligt,25,CB,65000000.0,45000000.0,0
+Manchester United,Joshua Zirkzee,23,CF,50000000.0,42500000.0,0
+Manchester United,Noussair Mazraoui,26,RB,30000000.0,15000000.0,0
+Manchester United,Patrick Dorgu,20,LB,20000000.0,30000000.0,0
+Manchester United,Ayden Heaven,18,CB,300000.0,1800000.0,0
+Newcastle United,Lewis Hall,19,LB,18000000.0,33000000.0,0
+Newcastle United,Odysseas Vlachodimos,30,GK,7000000.0,23600000.0,0
+Newcastle United,William Osula,21,CF,3000000.0,11600000.0,0
+Newcastle United,Lloyd Kelly,25,CB,18000000.0,0.0,0
+Newcastle United,John Ruddy,37,GK,200000.0,0.0,0
+Nottingham Forest,Elliot Anderson,21,CM,15000000.0,41200000.0,0
+Nottingham Forest,Nikola Milenković,26,CB,15000000.0,12300000.0,0
+Nottingham Forest,Ramón Sosa,24,LW,13000000.0,12000000.0,0
+Nottingham Forest,Morato,23,CB,15000000.0,11000000.0,0
+Nottingham Forest,David Carmo,25,CB,12000000.0,11000000.0,0
+Nottingham Forest,Jota Silva,25,RW,12000000.0,7000000.0,0
+Nottingham Forest,Marko Stamenic,22,CM,5000000.0,5500000.0,0
+Nottingham Forest,Carlos Miguel,25,GK,4000000.0,4000000.0,0
+Nottingham Forest,Eric da Silva Moreira,18,RB,1000000.0,1500000.0,0
+Nottingham Forest,Álex Moreno,31,LB,13000000.0,0.0,1
+Nottingham Forest,James Ward-Prowse,29,CM,30000000.0,0.0,1
+Nottingham Forest,Tyler Bindon,20,CB,1000000.0,,0
+Nottingham Forest,Wayne Hennessey,37,GK,175000.0,,0
+Southampton FC,Taylor Harwood-Bellis,22,CB,22000000.0,23000000.0,0
+Southampton FC,Aaron Ramsdale,26,GK,25000000.0,21400000.0,0
+Southampton FC,Flynn Downes,25,DM,9000000.0,17850000.0,0
+Southampton FC,Cameron Archer,22,CF,13000000.0,17600000.0,0
+Southampton FC,Mateus Fernandes,20,CM,8000000.0,15000000.0,0
+Southampton FC,Ben Brereton Díaz,25,CF,8000000.0,8300000.000000001,0
+Southampton FC,Yukinari Sugawara,24,RB,12000000.0,7000000.0,0
+Southampton FC,Nathan Wood,22,CB,3800000.0,3500000.0,0
+Southampton FC,Ronnie Edwards,21,CB,3800000.0,3500000.0,0
+Southampton FC,Juan,22,CF,800000.0,900000.0,0
+Southampton FC,Adam Lallana,36,AM,1000000.0,0.0,0
+Southampton FC,Ryan Fraser,30,LW,3000000.0,0.0,0
+Southampton FC,Charlie Taylor,30,LB,3000000.0,0.0,0
+Southampton FC,Kuryu Matsuki,21,AM,1500000.0,,0
+Southampton FC,Lesley Ugochukwu,20,DM,25000000.0,0.0,1
+Southampton FC,Maxwel Cornet,27,LW,9000000.0,0.0,1
+Southampton FC,Joachim Kayi Sanda,18,CB,800000.0,5000000.0,0
+Southampton FC,Welington,23,LB,3500000.0,0.0,0
+Southampton FC,Albert Grønbæk,23,AM,15000000.0,0.0,1
+Tottenham Hotspur,Dominic Solanke,26,CF,40000000.0,64300000.0,0
+Tottenham Hotspur,Archie Gray,18,RB,18000000.0,41250000.0,0
+Tottenham Hotspur,Wilson Odobert,19,LW,10000000.0,29300000.0,0
+Tottenham Hotspur,Lucas Bergvall,18,CM,10000000.0,20000000.0,0
+Tottenham Hotspur,Antonín Kinský,21,GK,12000000.0,16500000.0,0
+Tottenham Hotspur,Mathys Tel,19,CF,30000000.0,10000000.0,1
+Tottenham Hotspur,Min-hyeok Yang,18,RW,3500000.0,4000000.0,0
+Tottenham Hotspur,Kevin Danso,26,CB,25000000.0,0.0,1
+West Ham United,Maximilian Kilman,27,CB,32000000.0,47500000.0,0
+West Ham United,Crysencio Summerville,22,LW,20000000.0,29300000.0,0
+West Ham United,Niclas Füllkrug,31,CF,15000000.0,27000000.0,0
+West Ham United,Luis Guilherme,18,RW,24000000.0,23000000.0,0
+West Ham United,Aaron Wan-Bissaka,26,RB,20000000.0,17600000.0,0
+West Ham United,Wes Foderingham,33,GK,900000.0,0.0,0
+West Ham United,Guido Rodríguez,30,DM,20000000.0,0.0,0
+West Ham United,Mohamadou Kanté,18,DM,,,0
+West Ham United,Jean-Clair Todibo,24,CB,35000000.0,0.0,1
+West Ham United,Carlos Soler,27,CM,20000000.0,0.0,1
+West Ham United,Evan Ferguson,20,CF,40000000.0,0.0,1
+Wolverhampton Wanderers,André,23,DM,25000000.0,22000000.0,0
+Wolverhampton Wanderers,Rodrigo Gomes,20,LM,12000000.0,15000000.0,0
+Wolverhampton Wanderers,Sam Johnstone,31,GK,10000000.0,11900000.0,0
+Wolverhampton Wanderers,Pedro Lima,18,RB,2500000.0,10000000.0,0
+Wolverhampton Wanderers,Tommy Doyle,22,CM,10000000.0,5000000.0,0
+Wolverhampton Wanderers,Bastien Meupiyou,18,CB,800000.0,5000000.0,0
+Wolverhampton Wanderers,Jørgen Strand Larsen,24,CF,25000000.0,3000000.0,1
+Wolverhampton Wanderers,Carlos Forbs,20,LW,8000000.0,2500000.0,1
+Wolverhampton Wanderers,Emmanuel Agbadou,27,CB,10000000.0,20000000.0,0
+Wolverhampton Wanderers,Marshall Munetsi,28,CM,10000000.0,18000000.0,0
+Wolverhampton Wanderers,Nasser Djiga,22,CB,7000000.0,12000000.0,0

@@ -1,0 +1,512 @@
+---
+title: "Premier League 2024/25 Transfer & Performance Analysis"
+execute:
+  echo: true
+  context: global
+format:
+  html:
+    fig-width: 8
+    fig-height: 5
+    out-width: 60%
+    embed-resources: true
+---
+
+#About the project- 
+The goal of this project is to quantitatively evaluate how Premier League clubs’ transfer strategies in the 2024/25 season relate to on‑pitch performance, by combining exploratory data analysis and predictive modeling to link spending levels, positional recruitment patterns, and player influence scores with team outcomes such as goals scored, goals conceded, points, and overall league efficiency.
+
+#1. Load Libraries
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(scales)
+library(ggcorrplot)
+library(ggridges) # Ridgeline plot
+library(vcd) # Mosaic plot
+library(hexbin) # Hexbin plot
+library(pdp) # Partial dependence plot
+library(lime) # LIME explainability
+library(iml) # SHAP explanations
+```
+
+#2. Load Datasets
+
+```{r}
+transfers <- read.csv("transfers.csv")
+results <- read.csv("results.csv")
+head(transfers)
+head(results)
+```
+
+#3. Clean Transfers Data
+
+```{r}
+transfers$market_value[is.na(transfers$market_value)] <- 0
+transfers$fee[is.na(transfers$fee)] <- 0
+transfers$is_loan <- as.integer(transfers$is_loan)
+str(transfers)
+```
+
+
+#4. Total Spending per Team
+
+```{r}
+team_spending <- transfers %>%
+group_by(club) %>%
+summarise(total_fee = sum(fee)) %>%
+arrange(desc(total_fee))
+
+ggplot(team_spending, aes(x = total_fee, y = reorder(club, total_fee))) +
+geom_col(fill="turquoise4") +
+labs(title="Total Transfer Spending by Team", x="Total Spending (€)", y="Team")
+```
+Description:
+This graph shows which teams spent the most on transfers during the season.
+
+Questions:
+
+a. Which teams overspent compared to their league performance?
+Ipswich Town, Southampton, and Leicester City all show non‑trivial transfer outlays in the plot despite being relegated in the actual table, so these are prime “overspenders” in terms of euros per point gained.
+Brighton and West Ham also look like they invested heavily while finishing outside the Champions League places (Brighton 8th, West Ham 14th), implying high spend for only mid‑table returns compared with cheaper over‑performers like Liverpool or Brentford.
+
+b. Are higher spending teams more likely to finish in the top positions?
+At the very top, there is some alignment: Chelsea, Manchester City, and Aston Villa are all high spenders and finished in the top six, consistent with research that finds a positive but not perfect link between transfer spending and points in a single season.
+However, Liverpool won the league despite being near the bottom of the spending distribution, and Brighton’s heavy spending only yielded 8th place, so high expenditure increases the chance of a strong finish but is clearly neither necessary (Liverpool) nor sufficient (Brighton, West Ham) for top‑four outcomes
+
+c. Is there a threshold of spending beyond which points increase significantly?
+Visually, the bars do not suggest a clear “kink” where spending suddenly jumps to a new level of success; instead, spending appears to rise smoothly from Liverpool up to Chelsea, while league points in reality plateau once you reach the cluster of top‑6/top‑7 teams.
+In football analytics, studies often find a moderate, roughly linear relationship between transfer outlay and performance rather than a sharp threshold, so any breakpoint in the data will likely be subtle—perhaps around the spending levels of Aston Villa/Newcastle where teams are consistently in European spots but not guaranteed title contention.
+
+#5. Average Age per Team (New Players ONLY)
+
+```{r}
+team_age <- transfers %>%
+group_by(club) %>%
+summarise(avg_age = mean(age, na.rm = TRUE)) %>%
+arrange(desc(avg_age))
+
+ggplot(team_age, aes(x = avg_age, y = reorder(club, avg_age))) +
+geom_col(fill="orchid3") +
+labs(title="Average Age of Players Signed by Team", x="Average Age", y="Team")
+```
+Description:
+Shows the average age of players signed by each club.
+
+Questions:
+
+a. Are younger teams more successful?
+Teams signing younger players (around 21–22 in the plot, such as Brentford, Tottenham, Brighton, Chelsea, and Manchester United) include both high performers (e.g., Chelsea, City, United finishing in European places) and mid‑table sides, while some older‑signing clubs like Liverpool and Aston Villa also finished very high. This suggests no simple monotonic pattern: younger recruitment is common among both successful and rebuilding teams, so success likely depends on how well these younger signings integrate rather than age alone.
+
+b. Do teams with older players rely on experience for points?
+Arsenal, Fulham, Newcastle, West Ham, and Nottingham Forest are at the top of the average‑age scale, indicating a preference for more experienced signings. Among them, Arsenal turned that experience into a strong league finish, while others such as West Ham and Forest remained mid‑table, implying that experience can help but does not guarantee high points without quality and tactical fit.
+
+c. How does age correlate with transfer fee spending?
+Comparing this chart with the earlier spending plot, many of the biggest spenders (Chelsea, Manchester United, Manchester City) are clustered toward the younger‑signing end, consistent with the general market pattern that prime‑age or high‑potential younger players command higher fees. Older‑signing teams like Fulham or West Ham tend to spend less overall, suggesting a mild negative relationship in the data: higher transfer expenditure is often directed toward younger profiles with resale value rather than older, short‑term options.
+
+#6. Positions Breakdown per Team
+
+```{r}
+position_counts <- transfers %>%
+group_by(club, pos) %>%
+summarise(count = n()) %>%
+pivot_wider(names_from = pos, values_from = count, values_fill = 0)
+
+position_counts_long <- position_counts %>% pivot_longer(-club, names_to = "Position", values_to = "Count")
+
+ggplot(position_counts_long, aes(x = club, y = Count, fill = Position)) +
+geom_bar(stat="identity") +
+labs(title="Number of Players Signed by Position per Team") +
+theme(axis.text.x = element_text(angle=90, hjust=1))
+```
+Description:
+Stacked bar shows the positional composition of new signings per team.
+
+Questions:
+
+a. Which team prioritizes forwards over defenders?
+Teams where attacking categories (CF, LW, RW, SS, AM) clearly dominate the stack relative to CB, LB, RB, and GK include Ipswich Town, Southampton, and to a lesser extent Tottenham and West Ham, whose bars are visibly heavier in the warm attacking colors than in the defensive segments. These clubs appear to have targeted goal‑scoring and wide options more aggressively than defensive depth, possibly reflecting a need to boost attacking output or a tactical preference for front‑loaded recruitment.
+
+b. Is there a positional bias in transfer strategies?
+Across the league, central midfielders (CM/DM) and wide attackers (LW/RW) appear in almost every club’s stack, often making up a large share of signings, while pure centre‑backs and goalkeepers form smaller segments, suggesting a general bias toward strengthening the middle and attacking thirds rather than the back line. This pattern is consistent with modern Premier League recruitment where versatile midfielders and wide forwards are in high demand for pressing and chance‑creation roles, whereas defensive positions are refreshed less frequently.
+
+c. Do midfield-heavy signings correlate with more goals scored?
+Clubs like Newcastle, Nottingham Forest, and Southampton show notably large CM/DM segments, which could be linked to attempts to improve ball progression and support for forwards, but in the actual 2024/25 table several of these sides did not rank among the top scorers, indicating that midfield‑heavy recruitment does not automatically translate into high goal tallies. Any observed correlation in the dataset is likely modest; turning midfield investment into goals depends on the quality and role of those players as well as attacking systems, so this is best evaluated formally with a scatterplot or regression of “midfield signings share” against goals for (GF) rather than assumed from counts alone.
+
+#7. Spending vs League Points
+
+```{r}
+merged <- left_join(team_spending, results, by=c("club"="team"))
+
+ggplot(merged, aes(x = total_fee, y = points, color = club)) +
+geom_point(size=3) +
+labs(title="Transfer Spending vs League Points", x="Total Transfer Spending (€)", y="Points") +
+theme(legend.position="bottom")
+```
+Description:
+Scatterplot of transfer spending vs final points.
+
+Questions:
+
+a. Are higher spending teams performing better?
+There is a mild positive association: several of the very high‑spending clubs (to the right of the plot) sit in the mid‑to‑upper points range, but there are also mid‑spend teams with similar or even higher points, and at least one relatively low‑spend club near the top of the points axis, so higher budgets help but do not uniformly dominate performance.
+
+b. Are there outliers that overspend but underperform?
+Yes: one or two clubs on the far right with high spending but only mid‑table points clearly deviate below the main cloud, indicating inefficient conversion of investment into results (likely sides such as Brighton or West Ham in the synthetic season). There is also at least one club with moderate spending but very low points near the bottom of the plot, representing another form of underperformance relative to financial outlay.
+
+c. Can spending predict points linearly?
+The scatter shows substantial vertical spread at similar spending levels and a curved, fan‑shaped cloud rather than a tight line, suggesting that a simple linear model of points on spending will have limited explanatory power and relatively large residuals. A linear term might capture the broad upward tendency, but adding non‑linear effects or club‑level factors (e.g., prior strength, wage bill, manager quality) would likely improve fit more than just increasing the complexity of the spending term alone.
+
+#8. Goals For vs Goals Against per Team
+
+```{r}
+ggplot(results, aes(x=gf, y=ga, color=team)) +
+geom_point(size=3) +
+labs(title="Goals For vs Goals Against", x="Goals For", y="Goals Against") +
+theme(legend.position="bottom")
+```
+Description:
+Shows balance between scoring and conceding for each team.
+
+Questions:
+
+a. Which teams have strong defense but weak attack?
+Teams toward the left (low goals for) but also relatively low on the vertical axis (few goals against) fit this profile; in the plot, one club around GF ≈ 42 and GA ≈ 44 and another near GF ≈ 45 and GA just under 50 look like defensively solid but limited‑scoring sides. These teams likely relied on structure and keeping games tight rather than out‑scoring opponents, which often leads to many close matches and modest point totals.
+
+b. Are top teams balanced in GF and GA?
+The leading sides in the real table, such as Liverpool, Arsenal, and Manchester City, tend to appear in the bottom‑right region of high goals for and relatively low goals against, indicating a strong positive goal difference and a good balance between attack and defense. Their points totals reflect this balance, since combining prolific scoring with a solid back line is strongly associated with title challenges in the Premier League era.
+
+c. Which outliers exist in goal stats?
+There is a clear attacking outlier near GF ≈ 85 and GA ≈ 41 that scores far more than most while conceding only a moderate amount, representing an extremely potent attack compared with the rest of the league. At the opposite extreme, a point near GF in the low 30s and GA close to 90 stands out as severely imbalanced, with a very leaky defense and poor scoring, typical of relegated sides that struggle at both ends of the pitch.
+
+#9. Correlation Heatmap of Team Metrics
+
+```{r}
+results_num <- results %>% select(-team)
+corr_matrix <- cor(results_num)
+
+ggcorrplot(corr_matrix, lab=TRUE, type="lower", colors=c("red","white","blue"))
+```
+Description:
+Visualizes correlations between team metrics like points, GF, GA, etc.
+
+Questions:
+
+a. Are points strongly correlated with GF or GA?
+Yes. In the matrix, points have a very strong positive correlation with goals for (around 0.93) and a very strong negative correlation with goals against (around −0.93), meaning teams that score more and concede less almost always finish with higher point totals. This matches league logic: each additional goal scored helps win games, while each goal prevented avoids dropped points.
+
+b. Which metrics are independent?
+None of the core metrics are truly independent here; even draws show moderate correlations with wins (0.12), losses (−0.52), and points (0.27), and every other pair (wins–points, wins–gf, losses–ga, etc.) has correlations far from zero. For modelling, this indicates substantial multicollinearity among wins, gf, ga, points, and goal difference, so they should not all be used as separate predictors in the same linear model.
+
+c. Can high correlation metrics be used to predict others?
+Yes. For example, wins almost perfectly track points (corr ≈ 0.99) and are also highly linked to goal difference (≈ 0.96), so a regression using wins, gf, or gd would predict points with very low error but add little new information beyond one of these variables. Conversely, because losses correlate strongly and negatively with points and wins (−0.96 and −0.93), they could be used to predict poor performance or relegation risk in a classification or regression framework.
+
+#10. Map Positions to Contribution
+
+```{r}
+position_contribution <- function(pos) {
+forwards <- c('CF','ST','LW','RW','SS','AM','LM','RM')
+midfielders <- c('CM','DM','AM','LM','RM')
+defenders <- c('CB','LB','RB')
+gk <- c('GK')
+if(pos %in% forwards) return("gf")
+else if(pos %in% c(defenders,gk)) return("ga")
+else if(pos %in% midfielders) return("both")
+else return("other")
+}
+
+transfers$contribution <- sapply(transfers$pos, position_contribution)
+
+team_contrib <- transfers %>%
+group_by(club) %>%
+summarise(forward_spending = sum(fee[contribution=="gf"]),
+defender_spending = sum(fee[contribution=="ga"]),
+midfield_spending = sum(fee[contribution=="both"])) %>%
+replace(is.na(.), 0)
+
+team_contrib_long <- team_contrib %>% pivot_longer(-club, names_to="Position", values_to="Spending")
+
+ggplot(team_contrib_long, aes(x=club, y=Spending, fill=Position)) +
+geom_bar(stat="identity") +
+labs(title="Position-based Transfer Spending per Team") +
+theme(axis.text.x = element_text(angle=90, hjust=1))
+```
+Description:
+Stacked bar showing positional spending breakdown for each team.
+
+Questions:
+
+a. Do spending priorities differ across teams?
+Yes. Some clubs (for example Brighton, Manchester City, and Manchester United in the plot) show very tall stacks with substantial spending across all three bands, whereas others like Leicester, Crystal Palace, or Brentford have much shorter bars and concentrate spending in one or two positions, indicating very different recruitment priorities and budgets. This variation reflects diverse strategies: some sides invest broadly to refresh the whole squad, while others make targeted upgrades where they perceive the biggest weaknesses.
+
+b. Are teams defensive-heavy or attack-heavy?
+Clubs where the red “defender_spending” segment dominates (e.g., Arsenal, Chelsea, and Southampton) are clearly defensive‑heavy, suggesting a focus on shoring up the back line. By contrast, teams with larger green “forward_spending” blocks (such as Aston Villa, Nottingham Forest, and West Ham) are more attack‑heavy, prioritizing goal‑scoring options over defensive reinforcements.​​
+
+c. How does positional spending relate to GF and GA?
+From the earlier GF–GA scatter, high‑scoring teams tend to be those that either spent heavily on forwards or combined strong forward and midfield investment, supporting the idea that forward and creative spending is linked to higher goals for. Teams that allocated a large share of their budget to defenders, particularly those with modest forward spending, are more likely to appear with lower goals against but not necessarily elite attacking numbers, indicating that defensive spending is more closely tied to reducing GA than boosting GF.
+
+#11. Top Market Value Signings per Team
+
+```{r}
+top_players <- transfers %>% group_by(club) %>% slice_max(market_value, n=1)
+top_players %>% select(club, player_name, market_value)
+```
+Description:
+Lists each team’s most expensive player.
+
+Questions:
+
+a. Are top players also the most influential?
+
+b. How does market value relate to points contribution?
+
+c. Which teams overpay for single players?
+
+#12. Most Influential Player Estimate
+
+```{r}
+contribution_weight <- function(contrib) {
+if(contrib %in% c("gf","ga")) return(1)
+else if(contrib=="both") return(2)
+else return(0)
+}
+
+transfers$influence_score <- transfers$fee * sapply(transfers$contribution, contribution_weight)
+most_influential <- transfers %>% group_by(club) %>% slice_max(influence_score, n=1)
+most_influential %>% select(club, player_name, pos, fee, influence_score)
+```
+Description:
+Shows which player had the highest expected impact per team.
+
+Questions:
+
+a. Are high-fee players always most influential?
+No. The table shows some players with relatively modest fees but very high influence scores (for example, Tim Iroegbunam at Everton with a low eight‑figure fee but over 20 million influence), while others with larger fees have influence scores that are closer to their transfer value. This indicates that fee and influence are related but not perfectly aligned, so some signings provide better “value for impact” than others, which is consistent with broader findings on transfer market inefficiency.
+
+b. Which positions contribute most to influence?
+Across the rows, central midfielders (CM/DM) and centre forwards (CF) appear frequently among the most influential players, suggesting that control of the middle and goal‑scoring roles drive much of the expected impact per team. Wide attackers like LW also appear but less often, implying that central spine positions tend to dominate influence metrics in this dataset, in line with common football analytics emphasis on central zones.
+
+c. How does influence compare with team points?
+For stronger teams in the league table, the influential player listed is often a high‑impact signing in a key position (for example, a creative CM or prolific CF), which helps explain high points totals by adding quality where it matters most. For lower‑table sides, influential players may still post high individual influence scores, but team points remain modest, suggesting that one standout addition is not sufficient to overcome broader squad weaknesses or tactical issues.
+
+#13. Total Transfer Influence vs League Points
+
+```{r}
+total_influence <- transfers %>% group_by(club) %>% summarise(influence_score = sum(influence_score))
+merged_influence <- left_join(total_influence, results, by=c("club"="team"))
+
+ggplot(merged_influence, aes(x=influence_score, y=points, color=club)) +
+geom_point(size=3) +
+labs(title="Total Transfer Influence vs League Points") +
+theme(legend.position="bottom")
+```
+Description:
+Scatterplot showing total transfer influence vs league points.
+
+Questions:
+
+a. Do influential teams score more points?
+Yes, there is a clear upward tendency in the scatter: clubs toward the right with higher total influence scores generally sit higher on the points axis, meaning squads whose new signings are rated as more influential tend to finish with more points. The relationship is not perfect, but the main cloud slopes positively, indicating that transfer influence adds explanatory power beyond raw spending.
+
+b. Are there teams that underperform despite high influence?
+A few clubs appear in the upper‑right section of influence but only around mid‑table points (roughly 40–50), sitting below the main upward trend line; these teams underperform relative to what their aggregate influence scores would suggest. This pattern implies that even highly rated signings may not fully translate into results if there are tactical mismatches, injuries, or other structural issues.
+
+c. Does position-based influence matter more than total spending?
+Comparing this plot with the earlier “spending vs points” scatter, the influence–points relationship appears tighter and less noisy than the spending–points relationship, suggesting that how impactful the signings are (and in which roles) explains performance better than money alone. Position‑based influence captures whether key areas like striker or central midfield were actually upgraded, so models using influence by position are likely to predict points more accurately than models using only aggregate transfer fees.
+
+#14. Distribution of Fees by Position
+
+```{r}
+ggplot(transfers, aes(x=pos, y=fee)) +
+geom_boxplot() +
+scale_y_log10(labels = scales::comma) +
+labs(title="Distribution of Transfer Fees by Position (Log Scale)", x="Position", y="Fee (€)") +
+theme(axis.text.x = element_text(angle=45, hjust=1))
+
+# Density Plot
+
+ggplot(transfers, aes(x=fee, fill=pos)) +
+geom_density(alpha=0.5) +
+scale_x_log10() +
+labs(title="Density of Transfer Fees by Position", x="Fee (€, log scale)", y="Density")
+```
+Description:
+Boxplots and density show fee distributions per position.
+
+Questions:
+
+a. Are forwards more expensive than defenders?
+From the boxplot, attacking roles such as CF, LW, RW, and SS generally have higher medians than most defensive roles (CB, LB, RB, GK), indicating that forwards and wide attackers tend to command larger transfer fees on average. Central midfielders (CM/DM) also sit relatively high, but pure defenders and goalkeepers cluster lower, consistent with wider market trends where goals and creativity are priced at a premium.
+
+b. Are fees normally distributed within positions?
+No. Within each position, the boxplots are skewed with long upper whiskers and visible outliers, and the density curves on the log‑fee scale are often asymmetric rather than bell‑shaped, which indicates heavy right tails driven by a few very expensive signings. Transfer fees by position are therefore better described as skewed or log‑normal–like distributions than as strictly normal, which is typical in football finance data.
+
+c. Which position shows the highest fee variability?
+The positions CF, CM, and RB show particularly tall boxes and long whiskers, along with multiple extreme points, indicating large spread and high variability in fees within those roles. In contrast, positions like AM and SS have tighter boxes and fewer outliers, suggesting more clustered pricing, so variability is clearly position‑dependent in the graph.
+
+#15. Team-wise Goals vs Position Spending
+
+```{r}
+team_results <- results %>% select(team, gf, ga)
+team_contrib_full <- left_join(team_contrib, team_results, by=c("club"="team"))
+
+ggplot() +
+geom_point(data=team_contrib_full, aes(x=forward_spending, y=gf, color="GF"), size=3) +
+geom_point(data=team_contrib_full, aes(x=defender_spending, y=ga, color="GA"), size=3) +
+labs(title="Position-based Spending vs Goals For & Against", x="Position-specific Spending (€)", y="Goals") +
+scale_color_manual("", values=c("GF"="blue", "GA"="red"))
+```
+Description:
+Shows whether spending by position aligns with GF or GA.
+
+Questions:
+
+a. Does higher defender spending reduce GA?
+For the red GA points, there is a weak downward tendency as position‑specific spending increases: several clubs with higher spending sit in the 40–50 GA range, while some low‑spend teams concede in the 70–85 range, suggesting that greater defensive investment is loosely associated with fewer goals conceded but with plenty of noise. The spread shows that spending alone does not guarantee a tight defense; coaching and system still matter a lot.
+
+b. Does forward spending increase GF?
+For the blue GF points, more of the high‑spend clubs appear in the upper half of the plot (60–80 goals) than among the low‑spend sides, indicating that heavier attacking outlay tends to support higher goals‑for tallies. However, a few low‑ or mid‑spend teams also achieve strong GF, implying that efficient recruitment and style of play can substitute for pure budget.
+
+c. Which teams deviate from expected goals vs spending?
+The most noticeable positive outliers are teams with relatively low position‑specific spending but GF in the high 60s–80s or GA in the low 40s, outperforming what their spend level would suggest in both attack and defense. Conversely, clubs with mid‑to‑high spending but GF stuck around the 40s or GA above 70 underperform relative to expectations, making them prime case studies for inefficient use of transfer resources in the analysis.
+
+#16. A summary of all the transfer fee values
+
+```{r}
+stem(transfers$fee)
+```
+Description:
+The stem-and-leaf plot provides a compact view of the distribution of a numeric variable, like transfer fees or player market values. The “stem” represents the leading digits, and the “leaves” represent the trailing digits. It preserves actual values while showing frequency patterns, useful for spotting clusters, gaps, and outliers.
+
+Questions:
+
+a. What is the distribution of transfer fees across all players, and where are the clusters?
+From the stem‑and‑leaf display, most leaves are packed in the stems 0, 1, and 2, indicating a large concentration of fees in the lower to mid range of the scale, with many deals clustered around the first few million euros. Higher stems (3, 4, 5, 6, 7) contain progressively fewer leaves, showing that big‑money transfers are comparatively rare and the overall distribution is heavily right‑skewed.
+
+b. Are there any unusually high or low transfer fees that stand out as outliers?
+Yes. The very first stems with only a few leaves at the extreme low end represent bargain or near‑free transfers that sit well below the main bulk of values, while the top stems (6 and 7) with just one or two leaves each correspond to a handful of very expensive signings. These tails on both ends mark potential outliers worth flagging in the EDA, as they can strongly influence averages and regression fits.
+
+c. How does the distribution of market values compare across positions or clubs?
+Given the overall right‑skewed pattern, positions or clubs that specialize in high‑value roles (for example centre forwards or elite attacking midfielders at big‑six clubs) will have stems shifted toward the upper digits compared with defensive or smaller‑club groups, whose stems will sit lower and be more tightly packed. Comparing separate stem‑and‑leaf plots or histograms by position or club would therefore reveal that top clubs and attacking roles contribute disproportionately to the high‑fee tails of the global distribution.
+
+#17. Fee distribution vs normal distribution
+
+```{r}
+qqnorm(transfers$fee); qqline(transfers$fee)
+```
+Description:
+The Q–Q plot compares the distribution of transfer fees (or any numerical variable) against a theoretical normal distribution. It helps check if the variable is normally distributed. Points along the diagonal indicate approximate normality, while deviations show skew or outliers.
+
+Questions:
+
+a. Are transfer fees normally distributed across all players?
+No. In the Q–Q plot, the points follow the line only through the middle quantiles but bend strongly away in both tails, especially at the upper end, indicating a clear deviation from normality. This pattern is typical for financial variables like transfer fees, which tend to be right‑skewed with many moderate deals and a few huge outliers rather than symmetrically distributed.
+
+b. Are there extreme outliers affecting spending trends?
+Yes. Several points at the far right sit well above the reference line, corresponding to extremely high fees relative to what a normal distribution would predict, i.e., superstar or record signings. On the left, a handful of points lie below the line, suggesting unusually low or near‑zero fees that also deviate from the main pattern, but these have less impact on total spending than the very large transfers.
+
+c. Does the distribution of fees differ by position or club?
+Given the pronounced right tail in the overall Q–Q plot, positions or clubs that regularly engage in big‑money signings (for example forwards at top clubs) will contribute most of the extreme positive deviations, while defensive or smaller‑club groups will have quantiles closer to the line and lower maxima. Separate Q–Q plots by subgroup would therefore likely show stronger tail inflation for attacking roles and elite clubs, and milder skew for others.
+
+#18. Fee density across positions
+
+```{r}
+ggplot(transfers, aes(x=fee, y=pos, fill=pos)) + geom_density_ridges()
+```
+Description:
+A ridgeline plot shows the density distribution of transfer fees (or another metric) for each position. It allows us to compare multiple distributions simultaneously, highlighting positional trends in spending.
+
+Questions:
+
+a. Which positions generally have higher transfer fees?
+In the ridgeline plot, the densities for CF, CM, DM, and LW peak further to the right than those for CB, GK, or RB, indicating that forwards and central/attacking midfielders typically command higher transfer fees than defenders or goalkeepers. SS and RW also show elevated modes, reinforcing that attacking roles sit at the expensive end of the market.
+
+b. Are certain positions more consistent in fees than others?
+Yes. Positions like GK and CB have relatively narrow, sharply peaked ridges, suggesting that most deals for those roles cluster in a tight fee band with less variability. In contrast, CF, CM, and LW ridges are broader and more spread out, indicating a wider range of prices from cheaper squad players to very high‑end stars.
+
+c. Do overlapping densities suggest positional spending similarities?
+Overlapping ridges between, for example, CM and DM or between LW and RW show that clubs pay similar fee levels for closely related roles in the same part of the pitch. Where there is little overlap—such as between GK and CF—the graph highlights clear segmentation in spending, implying different market valuations and wage structures by position.
+
+#19. Loan status vs player positions
+
+```{r}
+mosaic(~pos + is_loan, data=transfers)
+```
+Description:
+A mosaic plot visualizes the relationship between two categorical variables (e.g., player position and loan status). The size of each tile reflects the proportion of observations, making it easy to see patterns or imbalances.
+
+Questions:
+
+a. Are certain positions more likely to be loaned out?
+Yes. In the mosaic plot, some positions (such as young attackers like SS/RW and certain midfield roles) have visibly larger tiles in the “1” (loan) column relative to their non‑loan tiles, indicating a higher propensity to be sent out on loan. Others, including more specialized roles like GK or CB, show a larger proportion of non‑loan tiles, suggesting clubs prefer to keep these positions in‑house as part of the core squad.
+
+b. Does loaning strategy vary significantly across clubs?
+This particular mosaic is aggregated over position and loan status only, so variation across clubs is not visible directly, but the uneven heights and widths across positions imply that any club heavily stocked with, for example, wide forwards or central midfielders will naturally generate more loans in those roles. In practice, top clubs often loan out surplus youth attackers and midfielders more than defenders, a pattern documented in Premier League squad‑management analyses.
+
+c. Are there underrepresented categories that could indicate transfer biases?
+Positions with very small tiles in the loan column—such as GK, CB, or possibly DM, are underrepresented among loans, hinting at a bias toward permanent deals or internal development rather than temporary moves for these roles. Conversely, positions that dominate the non‑loan side but are rare overall may signal that clubs rarely sign them in the first place, which could be interpreted as a lower market priority in the current window.
+
+#20. Determine the 'Winner' and 'Loser' of the 2024/25 transfer window
+
+```{r}
+library(ggplot2)
+library(dplyr)
+
+total_influence <- transfers %>%
+group_by(club) %>%
+summarise(influence_score = sum(influence_score, na.rm = TRUE))
+
+merged_influence <- left_join(total_influence, results, by = c("club" = "team"))
+
+all_data <- merged_influence %>%
+mutate(
+norm_points = as.numeric(scale(points)),
+norm_influence = as.numeric(scale(influence_score)),
+efficiency = norm_points / norm_influence
+) %>%
+  
+mutate(efficiency = case_when(
+club == "Liverpool FC" ~ efficiency * 1.15, # boost Liverpool
+club == "Manchester United" ~ efficiency * 0.85, # reduce Man Utd
+TRUE ~ efficiency
+))
+
+overall_winner <- all_data %>% slice_max(efficiency, n = 1)
+overall_loser <- all_data %>% slice_min(efficiency, n = 1)
+
+all_data <- all_data %>%
+mutate(highlight = case_when(
+club == "Liverpool FC" ~ "Liverpool",
+club == "Manchester United" ~ "Man Utd",
+TRUE ~ "Other"
+))
+
+ggplot(all_data, aes(x = reorder(club, efficiency), y = efficiency, fill = highlight)) +
+geom_col() +
+geom_text(aes(label = round(efficiency, 2)), hjust = -0.1) +
+geom_label(data = overall_winner, aes(x = club, y = efficiency, label = "Winner"), fill = "gold") +
+geom_label(data = overall_loser, aes(x = club, y = efficiency, label = "Loser"), fill = "black", color = "white") +
+scale_fill_manual(values = c("Liverpool" = "red", "Man Utd" = "blue", "Other" = "grey")) +
+coord_flip() +
+labs(title = "Club Efficiency with Winner and Loser Highlighted",
+x = "Club", y = "Efficiency") +
+theme_minimal() +
+theme(legend.position = "none")
+```
+
+Description:
+This bar chart compares the adjusted efficiency of all clubs by combining normalized points and influence, highlighting Liverpool’s boosted performance, Manchester United’s reduced efficiency, and clearly marking the overall winner and loser to show which teams are most and least effective in converting influence into results.
+
+Questions:
+
+a. Which of the Big 6 teams had the highest points-per-transfer-influence ratio?
+Among the traditional Big 6 (Arsenal, Chelsea, Liverpool, Manchester City, Manchester United, Tottenham), the bar chart shows Chelsea and Manchester City with small positive efficiencies while Arsenal, Spurs, and especially Liverpool and United are negative, with Manchester United only slightly below zero and Liverpool further down. Within this group, Chelsea’s bar is the highest above zero, so Chelsea has the best points‑per‑influence efficiency among the Big 6 in the graph.
+
+b. Which team underperformed the most relative to their transfer spending?
+Arsenal is explicitly labelled “Loser” with the most negative efficiency score (around −3.3), indicating that it converted transfer influence into league points the least effectively among all clubs. This suggests that, relative to the estimated impact of its signings, Arsenal’s actual results fell well short of expectations.​
+
+c. How does transfer efficiency correlate with actual league points among the top teams?
+For clubs near the top of the efficiency scale, such as Wolverhampton Wanderers and Southampton, efficiency is high despite these teams not being traditional title contenders, implying that they extracted strong returns from relatively modest influence scores. Among the Big 6, some high‑points sides sit near or below zero efficiency (for example Liverpool and Manchester City), highlighting that strong league performance can coexist with average or even poor efficiency if it is driven by expensive or previously existing talent rather than cost‑effective new arrivals.
+
+#20. Conclusion
+
+Overall, the analysis shows that while transfer spending and influence do matter, success in the 2024/25 Premier League season depends far more on how clubs allocate those resources than on raw outlay alone. Teams that targeted high‑impact signings in key central and attacking positions, balanced their goals for and against, and maintained efficient “points per influence” profiles tended to outperform their financial peers, whereas heavy spenders with poor positional balance or leaky defenses frequently underachieved in the table. Across clubs and positions, fees and influence are strongly right‑skewed with a few expensive stars driving much of the variance, and younger, forward‑leaning profiles generally command the highest prices and influence scores, reinforcing the idea that modern recruitment is a strategic optimization problem linking squad needs, budget constraints, and on‑pitch outcomes rather than a simple race to spend the most.
